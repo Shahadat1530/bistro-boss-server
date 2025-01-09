@@ -34,17 +34,28 @@ async function run() {
         const cartCollection = client.db('bistroDB').collection('carts');
 
         // user api's
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray();
+            res.send(result);
+        });
+
         app.post('/users', async (req, res) => {
             const user = req.body;
 
             const query = { email: user.email };
             const exitingUser = await userCollection.findOne(query);
-            if(exitingUser) {
-                return res.send({massage:'User already exists', insertedId: null})
+            if (exitingUser) {
+                return res.send({ massage: 'User already exists', insertedId: null })
             }
 
-
             const result = await userCollection.insertOne(user);
+            res.send(result);
+        });
+
+        app.delete('/users/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id)};
+            const result =  await userCollection.deleteOne(query);
             res.send(result);
         });
 
